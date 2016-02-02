@@ -208,28 +208,12 @@ pub mod problem09 {
 }
 
 pub mod problem10 {
+    use primal;
+
     pub fn main() -> usize {
-        let mut sum = 0;
-        const SIZE: usize = 2_000_000;
-        let mut slots = [true; SIZE];
-        slots[0] = false;
-        slots[1] = false;
-
-        for stride in 2..(SIZE/2) {
-            let mut pos = stride;
-            while pos < (SIZE - stride) {
-                pos += stride;
-                slots[pos] = false;
-            }
-        }
-
-        for (idx, &pr) in slots.into_iter().enumerate() {
-            if pr {
-                sum += idx;
-            }
-        }
-
-        sum
+        primal::Primes::all()
+            .take_while(|n| *n <= 2_000_000)
+            .fold(0, |a, b| (a as usize) + (b as usize))
     }
 }
 
