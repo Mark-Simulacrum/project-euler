@@ -5,3 +5,6 @@ authors = ["Mark Simulacrum <mark.simulacrum@gmail.com>"]
 
 [dependencies]
 primal = "0.2"
+stopwatch = "0.0.6"
+clippy = "*"
+num = "*"

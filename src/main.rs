@@ -1,55 +1,21 @@
 #![feature(test)]
+#![feature(plugin)]
+#![plugin(clippy)]
 
 extern crate test;
-
 extern crate primal;
+extern crate stopwatch;
+extern crate num;
 
-#[allow(dead_code)]
-mod primes {
-    fn is_prime(num: u64) -> bool {
-        for i in 2..(num / 2 + 1) {
-            if num % i == 0 {
-                return false;
-            }
-        }
-        true
-    }
-
-    pub struct Prime {
-        pub curr: u64
-    }
-
-    impl Iterator for Prime {
-        type Item = u64;
-
-        fn next(&mut self) -> Option<u64> {
-            let mut next = self.curr + 1;
-            while !is_prime(next) {
-                next += 1;
-            }
-
-            self.curr = next;
-
-            Some(self.curr)
-        }
-    }
-
-    pub fn primes() -> Prime {
-        Prime { curr: 0 }
-    }
-}
-
-#[allow(dead_code)]
-pub mod problem1 {
+pub mod problem01 {
     pub fn main() -> u32 {
-        (0..1000)
-            .filter(|num| num % 5 == 0 || num % 3 == 0)
+        (1..1000)
+            .filter(|num| num % 3 == 0 || num % 5 == 0)
             .fold(0, |sum, value| sum + value)
     }
 }
 
-#[allow(dead_code)]
-pub mod problem2 {
+pub mod problem02 {
     struct Fibonacci {
         curr: u64,
         next: u64
@@ -80,37 +46,31 @@ pub mod problem2 {
     }
 }
 
-#[allow(dead_code)]
-pub mod problem3 {
-    use super::primes::Prime;
+pub mod problem03 {
+    use primal;
 
-    pub fn main() -> u64 {
+    pub fn main() -> usize {
         let mut num = 600851475143;
-        let mut highest_prime_factor = 0;
 
-        let prime = Prime { curr: 1 };
-
-        for i in prime {
-            if num % i == 0 {
-                highest_prime_factor = i;
-
-                while num % i == 0 && num >= 2 {
-                    num /= i;
-                }
+        for prime in primal::Primes::all() {
+            if prime == 1 {
+                continue;
             }
 
+            if num % prime == 0 {
+                num /= prime;
 
-            if num == 1 {
-                break;
+                if num == 1 {
+                    return prime;
+                }
             }
         }
 
-        highest_prime_factor
+        0
     }
 }
 
-#[allow(dead_code)]
-pub mod problem4 {
+pub mod problem04 {
     use std::cmp;
 
     const FIRST_3_DIGIT: u64 = 100;
@@ -137,58 +97,59 @@ pub mod problem4 {
     }
 }
 
-#[allow(dead_code)]
-pub mod problem5 {
-    fn get_smallest() -> Option<u64> {
-        let max = (11..20).fold(1, |product, n| product * n);
-        for i in 1..max {
-            if i % 11 == 0 &&
-                i % 12 == 0 &&
-                i % 13 == 0 &&
-                i % 14 == 0 &&
-                i % 15 == 0 &&
-                i % 16 == 0 &&
-                i % 17 == 0 &&
-                i % 18 == 0 &&
-                i % 19 == 0 &&
-                i % 20 == 0 {
-                    return Some(i);
+pub mod problem05 {
+    use primal;
+    use std::collections::HashMap;
+
+    pub fn main() -> usize {
+        let sieve = primal::Sieve::new(7);
+
+        let mut hashmap = HashMap::new();
+        for i in 2..21 {
+            for (prime, mut exponent) in sieve.factor(i).unwrap() {
+                let entry = hashmap.entry(prime).or_insert(exponent);
+                if entry < &mut exponent {
+                    *entry = exponent;
+                }
             }
         }
-        None
-    }
 
-    pub fn main() -> u64 {
-        get_smallest().unwrap()
+        hashmap.iter()
+            .map(|(prime, exponent)| {
+                prime.pow(*exponent as u32)
+            })
+            .fold(1, |sum, c| sum * c)
     }
 }
 
-#[allow(dead_code)]
-pub mod problem6 {
-    pub fn main() -> u64 {
-        let mut sum_of_squares:u64 = 0;
-        let mut square_of_sums:u64 = 0;
+pub mod problem06 {
+    use num;
+    use num::bigint::ToBigUint;
+
+    pub fn main() -> num::BigUint {
+        let mut sum_of_squares: num::BigUint = num::Zero::zero();
+        let mut square_of_sums: num::BigUint = num::Zero::zero();
+
         for i in 1..101u64 {
-            sum_of_squares += i.pow(2);
-            square_of_sums += i;
+            sum_of_squares = sum_of_squares + i.pow(2).to_biguint().unwrap();
+            square_of_sums = square_of_sums + i.to_biguint().unwrap();
         };
-        square_of_sums = square_of_sums.pow(2);
+
+        square_of_sums = num::pow(square_of_sums, 2);
 
         square_of_sums - sum_of_squares
     }
 }
 
-#[allow(dead_code)]
-pub mod problem7 {
-    use super::primes::primes;
+pub mod problem07 {
+    use primal;
 
-    pub fn main() -> u64 {
-        primes().nth(10_001).unwrap()
+    pub fn main() -> usize {
+        primal::StreamingSieve::nth_prime(10_001)
     }
 }
 
-#[allow(dead_code)]
-pub mod problem8 {
+pub mod problem08 {
     pub fn main() -> u64 {
         let input =
                     "73167176531330624919225119674426574742355349194934\
@@ -223,7 +184,6 @@ pub mod problem8 {
             }
             if product > largest {
                 largest = product;
-                // println!("{:?}", str::from_utf8(&input_bytes[i..i + span_width]).unwrap())
             }
         };
 
@@ -231,8 +191,7 @@ pub mod problem8 {
     }
 }
 
-#[allow(dead_code)]
-pub mod problem9 {
+pub mod problem09 {
     pub fn main() -> u64 {
         let s = 1000u64;
 
@@ -248,7 +207,6 @@ pub mod problem9 {
     }
 }
 
-#[allow(dead_code)]
 pub mod problem10 {
     pub fn main() -> usize {
         let mut sum = 0;
@@ -275,10 +233,10 @@ pub mod problem10 {
     }
 }
 
-#[allow(dead_code)]
 pub mod problem11 {
     use std::cmp;
 
+    #[allow(needless_range_loop)]
     pub fn main() -> u32 {
         let input = vec!(
             vec!(08, 02, 22, 97, 38, 15, 00, 40, 00, 75, 04, 05, 07, 78, 52, 12, 50, 77, 91, 08),
@@ -359,59 +317,54 @@ pub mod problem11 {
             }
         }
 
-        return largest_product;
+        largest_product
     }
 }
 
-#[allow(dead_code)]
 pub mod problem12 {
     use primal::*;
-    use std::cmp::max;
 
-    fn num_divisors(n: u64) -> Option<usize> {
-        let (_lo, hi) = estimate_nth_prime(n);
-        let sieve = Sieve::new(hi as usize);
+    pub struct TriangleNums {
+        curr: u64,
+        index: u64
+    }
 
-        match sieve.factor(n as usize) {
-            Ok(factors) => Some(factors.into_iter().fold(1, |acc, (_, x)| acc * (x + 1))),
-            Err(_) => None,
+    impl Iterator for TriangleNums {
+        type Item = u64;
+
+        fn next(&mut self) -> Option<u64> {
+            self.index = self.index + 1;
+            self.curr = self.curr + self.index;
+
+            Some(self.curr)
         }
     }
 
-    fn sum_num_up_to(n: u64) -> u64 {
-        let mut sum = 0;
-        for num in 1..n {
-            sum += num
-        }
-        sum
+    pub fn triangle_nums() -> TriangleNums {
+        TriangleNums { curr: 0, index: 0 }
+    }
+
+    fn num_divisors(n: u64, sieve: &Sieve) -> usize {
+        sieve.factor(n as usize)
+            .unwrap()
+            .into_iter()
+            .map(|(_, x)| x)
+            .fold(1, |acc, x| acc * (x + 1))
     }
 
     pub fn main() -> u64 {
-        let mut current = 1;
-        let mut max_factor_seen = 0;
+        // Hopefully 1 thousand primes is enough.
+        // We currently do no checking to ensure this;
+        // and num_divisors will panic on unwrapping sieve.factor
+        // if this isn't high enough.
+        let (_, hi) = estimate_nth_prime(1000);
+        let sieve = Sieve::new(hi as usize);
 
-        while max_factor_seen <= 500 {
-            let factor_amount = num_divisors(current).unwrap();
-            max_factor_seen = max(max_factor_seen, factor_amount);
-
-            current += (9u64).pow(10);
-            println!("Continuing: {}, factors: {}, max_factors: {}", current, factor_amount, max_factor_seen);
-        }
-
-        println!("Computed upper_bound: {}", current);
-
-        let upper_bound = current;
-        max_factor_seen = 0;
-        for num in (1..upper_bound).rev() {
-            let current = sum_num_up_to(num);
-
-            let factor_amount = num_divisors(current).unwrap();
-            max_factor_seen = max(max_factor_seen, factor_amount);
-
-            println!("current: {}: {} ; max: {}", current, factor_amount, max_factor_seen);
+        for num in triangle_nums() {
+            let factor_amount = num_divisors(num, &sieve);
 
             if factor_amount > 500 {
-                return current;
+                return num;
             }
         }
 
@@ -419,7 +372,127 @@ pub mod problem12 {
     }
 }
 
-#[allow(dead_code)]
+pub mod problem13 {
+    use num;
+
+    pub fn main() -> u64 {
+        let nums: Vec<&str> = vec![
+            "37107287533902102798797998220837590246510135740250",
+            "46376937677490009712648124896970078050417018260538",
+            "74324986199524741059474233309513058123726617309629",
+            "91942213363574161572522430563301811072406154908250",
+            "23067588207539346171171980310421047513778063246676",
+            "89261670696623633820136378418383684178734361726757",
+            "28112879812849979408065481931592621691275889832738",
+            "44274228917432520321923589422876796487670272189318",
+            "47451445736001306439091167216856844588711603153276",
+            "70386486105843025439939619828917593665686757934951",
+            "62176457141856560629502157223196586755079324193331",
+            "64906352462741904929101432445813822663347944758178",
+            "92575867718337217661963751590579239728245598838407",
+            "58203565325359399008402633568948830189458628227828",
+            "80181199384826282014278194139940567587151170094390",
+            "35398664372827112653829987240784473053190104293586",
+            "86515506006295864861532075273371959191420517255829",
+            "71693888707715466499115593487603532921714970056938",
+            "54370070576826684624621495650076471787294438377604",
+            "53282654108756828443191190634694037855217779295145",
+            "36123272525000296071075082563815656710885258350721",
+            "45876576172410976447339110607218265236877223636045",
+            "17423706905851860660448207621209813287860733969412",
+            "81142660418086830619328460811191061556940512689692",
+            "51934325451728388641918047049293215058642563049483",
+            "62467221648435076201727918039944693004732956340691",
+            "15732444386908125794514089057706229429197107928209",
+            "55037687525678773091862540744969844508330393682126",
+            "18336384825330154686196124348767681297534375946515",
+            "80386287592878490201521685554828717201219257766954",
+            "78182833757993103614740356856449095527097864797581",
+            "16726320100436897842553539920931837441497806860984",
+            "48403098129077791799088218795327364475675590848030",
+            "87086987551392711854517078544161852424320693150332",
+            "59959406895756536782107074926966537676326235447210",
+            "69793950679652694742597709739166693763042633987085",
+            "41052684708299085211399427365734116182760315001271",
+            "65378607361501080857009149939512557028198746004375",
+            "35829035317434717326932123578154982629742552737307",
+            "94953759765105305946966067683156574377167401875275",
+            "88902802571733229619176668713819931811048770190271",
+            "25267680276078003013678680992525463401061632866526",
+            "36270218540497705585629946580636237993140746255962",
+            "24074486908231174977792365466257246923322810917141",
+            "91430288197103288597806669760892938638285025333403",
+            "34413065578016127815921815005561868836468420090470",
+            "23053081172816430487623791969842487255036638784583",
+            "11487696932154902810424020138335124462181441773470",
+            "63783299490636259666498587618221225225512486764533",
+            "67720186971698544312419572409913959008952310058822",
+            "95548255300263520781532296796249481641953868218774",
+            "76085327132285723110424803456124867697064507995236",
+            "37774242535411291684276865538926205024910326572967",
+            "23701913275725675285653248258265463092207058596522",
+            "29798860272258331913126375147341994889534765745501",
+            "18495701454879288984856827726077713721403798879715",
+            "38298203783031473527721580348144513491373226651381",
+            "34829543829199918180278916522431027392251122869539",
+            "40957953066405232632538044100059654939159879593635",
+            "29746152185502371307642255121183693803580388584903",
+            "41698116222072977186158236678424689157993532961922",
+            "62467957194401269043877107275048102390895523597457",
+            "23189706772547915061505504953922979530901129967519",
+            "86188088225875314529584099251203829009407770775672",
+            "11306739708304724483816533873502340845647058077308",
+            "82959174767140363198008187129011875491310547126581",
+            "97623331044818386269515456334926366572897563400500",
+            "42846280183517070527831839425882145521227251250327",
+            "55121603546981200581762165212827652751691296897789",
+            "32238195734329339946437501907836945765883352399886",
+            "75506164965184775180738168837861091527357929701337",
+            "62177842752192623401942399639168044983993173312731",
+            "32924185707147349566916674687634660915035914677504",
+            "99518671430235219628894890102423325116913619626622",
+            "73267460800591547471830798392868535206946944540724",
+            "76841822524674417161514036427982273348055556214818",
+            "97142617910342598647204516893989422179826088076852",
+            "87783646182799346313767754307809363333018982642090",
+            "10848802521674670883215120185883543223812876952786",
+            "71329612474782464538636993009049310363619763878039",
+            "62184073572399794223406235393808339651327408011116",
+            "66627891981488087797941876876144230030984490851411",
+            "60661826293682836764744779239180335110989069790714",
+            "85786944089552990653640447425576083659976645795096",
+            "66024396409905389607120198219976047599490197230297",
+            "64913982680032973156037120041377903785566085089252",
+            "16730939319872750275468906903707539413042652315011",
+            "94809377245048795150954100921645863754710598436791",
+            "78639167021187492431995700641917969777599028300699",
+            "15368713711936614952811305876380278410754449733078",
+            "40789923115535562561142322423255033685442488917353",
+            "44889911501440648020369068063960672322193204149535",
+            "41503128880339536053299340368006977710650566631954",
+            "81234880673210146739058568557934581403627822703280",
+            "82616570773948327592232845941706525094512325230608",
+            "22918802058777319719839450180888072429661980811197",
+            "77158542502016545090413245809786882778948721859617",
+            "72107838435069186155435662884062257473692284509516",
+            "20849603980134001723930671666823555245252804609722",
+            "53503534226472524250874054075591789781264330331690",
+        ];
+
+        assert_eq!(nums.len(), 100);
+
+        let mut sum: num::BigUint = num::Zero::zero();
+        for num in &nums {
+            assert_eq!(num.len(), 50);
+            sum = sum + num.parse::<num::BigUint>().unwrap();
+        }
+
+        let mut str_sum = sum.to_string();
+        str_sum.truncate(10);
+        str_sum.parse::<u64>().unwrap()
+    }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -431,29 +504,65 @@ mod bench {
     use super::*;
     use test::Bencher;
 
-    #[bench]
-    fn bench(b: &mut Bencher) {
-        b.iter(|| problem2::main());
+    macro_rules! benchmark {
+        ($toRun: ident) => (
+            #[bench]
+            #[allow(redundant_closure)]
+            fn $toRun(b: &mut Bencher) {
+                b.iter(|| $toRun::main());
+            }
+        )
     }
 
-    // #[bench]
-    // fn bench_2(b: &mut Bencher) {
-    //     b.iter(|| problem2::main2());
-    // }
+    #[test]
+    fn problem12_trianglenums() {
+        let mut iter = problem12::triangle_nums();
+
+        assert_eq!(iter.next().unwrap(), 1);
+        assert_eq!(iter.next().unwrap(), 3);
+        assert_eq!(iter.next().unwrap(), 6);
+        assert_eq!(iter.next().unwrap(), 10);
+        assert_eq!(iter.next().unwrap(), 15);
+    }
+
+    benchmark!(problem01);
+    benchmark!(problem02);
+    benchmark!(problem03);
+    benchmark!(problem04);
+    benchmark!(problem05);
+    benchmark!(problem06);
+    benchmark!(problem07);
+    benchmark!(problem08);
+    benchmark!(problem09);
+    benchmark!(problem10);
+    benchmark!(problem11);
+    benchmark!(problem12);
+    benchmark!(problem13);
 }
 
+use stopwatch::{Stopwatch};
 fn main() {
-    // println!("Problem #1: {}", problem1::main());
-    println!("Problem #2: {}", problem2::main());
-    // println!("Problem #3: {}", problem3::main());
-    // println!("Problem #4: {}", problem4::main());
-    // println!("Problem #4: {}", problem4::main2());
-    // println!("Problem #5: {}", problem5::main());
-    // println!("Problem #6: {}", problem6::main());
-    // println!("Problem #7: {}", problem7::main());
-    // println!("Problem #8: {}", problem8::main());
-    // println!("Problem #9: {}", problem9::main());
-    // println!("Problem #10: {}", problem10::main());
-    // println!("Problem #11: {:?}", problem11::main());
-    // println!("Problem #12: {:?}", problem12::main());
+    macro_rules! run_problem {
+        ($toRun: ident) => (
+            {
+                let sw = Stopwatch::start_new();
+                let result = $toRun::main();
+                println!("{}: {} in {}ms", stringify!($toRun), result, sw.elapsed_ms());
+            }
+        )
+    }
+
+    run_problem!(problem01);
+    run_problem!(problem02);
+    run_problem!(problem03);
+    run_problem!(problem04);
+    run_problem!(problem05);
+    run_problem!(problem06);
+    run_problem!(problem07);
+    run_problem!(problem08);
+    run_problem!(problem09);
+    run_problem!(problem10);
+    run_problem!(problem11);
+    run_problem!(problem12);
+    run_problem!(problem13);
 }
