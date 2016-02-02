@@ -195,11 +195,11 @@ pub mod problem09 {
     pub fn main() -> u64 {
         let s = 1000u64;
 
-        for a in 1..1000u64 {
-            for b in 1..1000u64 - a {
+        for a in 1..s {
+            for b in 1..s - a {
                 let c = s - a - b;
                 if a.pow(2) + b.pow(2) == c.pow(2) {
-                    return a * b * (1000 - a - b)
+                    return a * b * c;
                 }
             }
         }
