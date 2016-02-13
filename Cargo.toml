@@ -1,10 +1,10 @@
 [package]
+authors = ["Mark Simulacrum <mark.simulacrum@gmail.com>"]
 name = "euler-rust"
 version = "0.1.0"
-authors = ["Mark Simulacrum <mark.simulacrum@gmail.com>"]
 
 [dependencies]
-primal = "0.2"
+clippy = "0.0.39"
+num = "0.1.30"
+primal = "0.2.3"
 stopwatch = "0.0.6"
-clippy = "*"
-num = "*"
