@@ -476,6 +476,35 @@ pub mod problem13 {
     }
 }
 
+pub mod problem14 {
+    pub fn main() -> u64 {
+        let mut max_length = 0;
+        let mut max_num = 1;
+
+        for start_num in (1..1_000_000).filter(|x| x % 2 > 0) {
+            let mut current_num: u64 = start_num;
+            let mut iterations = 1;
+
+            while current_num != 1 {
+                current_num = if current_num % 2 == 0 {
+                    current_num / 2
+                } else {
+                    current_num * 3 + 1
+                };
+
+                iterations += 1;
+            }
+
+            if iterations > max_length {
+                max_length = iterations;
+                max_num = start_num;
+            }
+        }
+
+        max_num
+    }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -521,6 +550,7 @@ mod bench {
     benchmark!(problem11);
     benchmark!(problem12);
     benchmark!(problem13);
+    benchmark!(problem14);
 }
 
 use stopwatch::{Stopwatch};
@@ -548,4 +578,5 @@ fn main() {
     run_problem!(problem11);
     run_problem!(problem12);
     run_problem!(problem13);
+    run_problem!(problem14);
 }
