@@ -505,6 +505,21 @@ pub mod problem14 {
     }
 }
 
+pub mod problem15 {
+    pub fn main() -> u64 {
+        let size = 20;
+
+        let n = size * 2;
+        let k = size;
+
+        // The non-ideal way of doing this. In reality, this is just
+        // `(2*size)! / size!`; but that causes integer overflow.
+        // 40! isn't small.
+        (0..k).zip(1..(k + 1))
+            .fold(1.0, |r, (a, b)| r * ((n - a) as f64 / b as f64)) as u64
+    }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -551,6 +566,7 @@ mod bench {
     benchmark!(problem12);
     benchmark!(problem13);
     benchmark!(problem14);
+    benchmark!(problem15);
 }
 
 use stopwatch::{Stopwatch};
@@ -579,4 +595,5 @@ fn main() {
     run_problem!(problem12);
     run_problem!(problem13);
     run_problem!(problem14);
+    run_problem!(problem15);
 }
