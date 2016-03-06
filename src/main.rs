@@ -520,6 +520,17 @@ pub mod problem15 {
     }
 }
 
+pub mod problem16 {
+    use num;
+    use num::bigint::ToBigUint;
+
+    pub fn main() -> u32 {
+        let r = num::checked_pow(2.to_biguint().unwrap(), 1000).unwrap();
+
+        r.to_str_radix(10).chars().fold(0, |r, c| r + c.to_digit(10).unwrap())
+    }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -567,6 +578,7 @@ mod bench {
     benchmark!(problem13);
     benchmark!(problem14);
     benchmark!(problem15);
+    benchmark!(problem16);
 }
 
 use stopwatch::{Stopwatch};
@@ -596,4 +608,5 @@ fn main() {
     run_problem!(problem13);
     run_problem!(problem14);
     run_problem!(problem15);
+    run_problem!(problem16);
 }
