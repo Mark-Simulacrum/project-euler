@@ -531,6 +531,13 @@ pub mod problem16 {
     }
 }
 
+/// Unimplemented in code due to problem consisting of
+/// code that requires extensive matching. Eventual
+/// implementation will happen, but not as of yet.
+pub mod problem17 {
+    pub fn main() -> u64 { 0 }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -579,6 +586,7 @@ mod bench {
     benchmark!(problem14);
     benchmark!(problem15);
     benchmark!(problem16);
+    benchmark!(problem17);
 }
 
 use stopwatch::{Stopwatch};
@@ -609,4 +617,5 @@ fn main() {
     run_problem!(problem14);
     run_problem!(problem15);
     run_problem!(problem16);
+    run_problem!(problem17);
 }
