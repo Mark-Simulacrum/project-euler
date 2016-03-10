@@ -4,7 +4,7 @@ name = "euler-rust"
 version = "0.1.0"
 
 [dependencies]
-clippy = "0.0.46"
+clippy = "0.0.49"
 num = "0.1.30"
 primal = "0.2.3"
 stopwatch = "0.0.6"
