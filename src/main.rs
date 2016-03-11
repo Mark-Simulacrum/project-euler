@@ -538,6 +538,59 @@ pub mod problem17 {
     pub fn main() -> u64 { 0 }
 }
 
+pub mod problem18 {
+    use std::cmp;
+
+    fn next_row_indices(index: usize) -> (usize, usize) {
+        (index, index + 1)
+    }
+
+    fn next_row_values(index: usize, row: &[u64]) -> (u64, u64) {
+        let indices = next_row_indices(index);
+        (row[indices.0], row[indices.1])
+    }
+
+    pub fn main() -> u64 {
+        let mut input: Vec<Vec<u64>> = vec![
+            vec![75],
+            vec![95, 64],
+            vec![17, 47, 82],
+            vec![18, 35, 87, 10],
+            vec![20, 04, 82, 47, 65],
+            vec![19, 01, 23, 75, 03, 34],
+            vec![88, 02, 77, 73, 07, 63, 67],
+            vec![99, 65, 04, 28, 06, 16, 70, 92],
+            vec![41, 41, 26, 56, 83, 40, 80, 70, 33],
+            vec![41, 48, 72, 33, 47, 32, 37, 16, 94, 29],
+            vec![53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14],
+            vec![70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57],
+            vec![91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48],
+            vec![63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31],
+            vec![04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23]
+        ];
+
+        let mut previous_row = input.pop();
+        while let Some(row) = input.pop() {
+            let mut new_row = Vec::new();
+
+            if let Some(previous_row) = previous_row {
+                for (index, number) in row.iter().enumerate() {
+                    let next_row_vals = next_row_values(index, &previous_row);
+
+                    let sum = number + cmp::max(next_row_vals.0, next_row_vals.1);
+
+                    new_row.push(sum);
+                };
+
+            }
+
+            previous_row = Some(new_row);
+        };
+
+        previous_row.unwrap()[0]
+    }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -587,6 +640,7 @@ mod bench {
     benchmark!(problem15);
     benchmark!(problem16);
     benchmark!(problem17);
+    benchmark!(problem18);
 }
 
 use stopwatch::{Stopwatch};
@@ -618,4 +672,5 @@ fn main() {
     run_problem!(problem15);
     run_problem!(problem16);
     run_problem!(problem17);
+    run_problem!(problem18);
 }
