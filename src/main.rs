@@ -663,6 +663,19 @@ pub mod problem19 {
     }
 }
 
+pub mod problem20 {
+    use num::bigint::ToBigUint;
+
+    pub fn main() -> u32 {
+        let mut r = 1.to_biguint().unwrap();
+        for i in 1...100 {
+            r = r * i.to_biguint().unwrap();
+        }
+
+        r.to_str_radix(10).chars().fold(0, |r, c| r + c.to_digit(10).unwrap())
+    }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -714,6 +727,7 @@ mod bench {
     benchmark!(problem17);
     benchmark!(problem18);
     benchmark!(problem19);
+    benchmark!(problem20);
 }
 
 use stopwatch::{Stopwatch};
@@ -747,4 +761,5 @@ fn main() {
     run_problem!(problem17);
     run_problem!(problem18);
     run_problem!(problem19);
+    run_problem!(problem20);
 }
