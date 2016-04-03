@@ -1,5 +1,6 @@
 #![feature(test)]
 #![feature(plugin)]
+#![feature(inclusive_range_syntax)]
 #![plugin(clippy)]
 
 extern crate test;
@@ -591,6 +592,77 @@ pub mod problem18 {
     }
 }
 
+pub mod problem19 {
+    #[derive(Debug, PartialEq, Eq)]
+    enum Day {
+        Sunday,
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday
+    }
+
+    impl Day {
+        fn next(&self) -> Self {
+            match *self {
+                Day::Sunday => Day::Monday,
+                Day::Monday => Day::Tuesday,
+                Day::Tuesday => Day::Wednesday,
+                Day::Wednesday => Day::Thursday,
+                Day::Thursday => Day::Friday,
+                Day::Friday => Day::Saturday,
+                Day::Saturday => Day::Sunday
+            }
+        }
+    }
+
+    pub fn main() -> u64 {
+        let mut day_of_week = Day::Monday;
+
+        let mut first_saturdays = 0;
+
+        for year in 1900...2000 {
+            let is_leap = year % 4 == 0 && !(year % 100 == 0 && year % 400 != 0);
+
+            // Jan1 Feb2 Mar3 Apr4 May5 Jun6 Jul7 Aug8 Sep9 Oct10 Nov11 Dec12
+            for month in 1...12 {
+                let number_of_days = if month == 2 {
+                    if is_leap {
+                        29
+                    } else {
+                        28
+                    }
+                } else if month == 9 || month == 4 || month == 6 || month == 11 {
+                    30
+                } else {
+                    31
+                };
+
+                let mut day = 1;
+
+                if year != 1900 && day_of_week == Day::Saturday {
+                    first_saturdays += 1;
+                }
+
+                day += 1;
+
+                while number_of_days - day > 7 {
+                    day += 7;
+                }
+
+                while day <= number_of_days {
+                    day_of_week = day_of_week.next();
+                    day += 1;
+                }
+            }
+        }
+
+        first_saturdays
+    }
+}
+
 pub mod problem_x {
     pub fn main() -> u64 {
         1
@@ -641,6 +713,7 @@ mod bench {
     benchmark!(problem16);
     benchmark!(problem17);
     benchmark!(problem18);
+    benchmark!(problem19);
 }
 
 use stopwatch::{Stopwatch};
@@ -673,4 +746,5 @@ fn main() {
     run_problem!(problem16);
     run_problem!(problem17);
     run_problem!(problem18);
+    run_problem!(problem19);
 }
